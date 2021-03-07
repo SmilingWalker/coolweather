@@ -1,0 +1,10 @@
+<litepa>
+    <dbname value="cool_weather"/>
+    <version value = "1"/>
+    <list>
+        <mapping class = "com.example.coolweather.beans.City"/>
+        <mapping class = "com.example.coolweather.beans.County"/>
+        <mapping class = "com.example.coolweather.beans.Province"/>
+
+    </list>
+</litepa>
