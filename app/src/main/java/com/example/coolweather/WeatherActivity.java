@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.coolweather.gson.Forecast;
 import com.example.coolweather.gson.Weather;
+import com.example.coolweather.service.AutoUpdateService;
 import com.example.coolweather.util.HttpUtil;
 import com.example.coolweather.util.Utility;
 
@@ -170,36 +171,43 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     private void showWeatherInfo(Weather weather) {
-        title_updateTime_view.setText(weather.basic.update.updateTime.split(" ")[1]);
-        title_cityName_view.setText(weather.basic.cityName);
-        now_info_view.setText(weather.now.more.info);
-        now_degree_view.setText(weather.now.temperature+"℃");
+        if (weather!=null){
+            title_updateTime_view.setText(weather.basic.update.updateTime.split(" ")[1]);
+            title_cityName_view.setText(weather.basic.cityName);
+            now_info_view.setText(weather.now.more.info);
+            now_degree_view.setText(weather.now.temperature+"℃");
 
-        forecast_layout.removeAllViews();
-        for(Forecast forecast:weather.forecastList){
-            View view = LayoutInflater.from(this).inflate(R.layout.forecast_item,forecast_layout,false);
-            TextView forecast_date_view,forecast_info_view,forecast_max_view,forecast_min_view;
-            forecast_date_view = view.findViewById(R.id.forecast_date_view);
-            forecast_info_view = view.findViewById(R.id.forecast_info_view);
-            forecast_min_view = view.findViewById(R.id.forecast_date_min);
-            forecast_max_view = view.findViewById(R.id.forecast_date_max);
-            forecast_date_view.setText(forecast.date);
-            forecast_info_view.setText(forecast.more.info);
-            forecast_max_view.setText(forecast.temperature.max);
-            forecast_min_view.setText(forecast.temperature.min);
-            forecast_layout.addView(view);
+            forecast_layout.removeAllViews();
+            for(Forecast forecast:weather.forecastList){
+                View view = LayoutInflater.from(this).inflate(R.layout.forecast_item,forecast_layout,false);
+                TextView forecast_date_view,forecast_info_view,forecast_max_view,forecast_min_view;
+                forecast_date_view = view.findViewById(R.id.forecast_date_view);
+                forecast_info_view = view.findViewById(R.id.forecast_info_view);
+                forecast_min_view = view.findViewById(R.id.forecast_date_min);
+                forecast_max_view = view.findViewById(R.id.forecast_date_max);
+                forecast_date_view.setText(forecast.date);
+                forecast_info_view.setText(forecast.more.info);
+                forecast_max_view.setText(forecast.temperature.max);
+                forecast_min_view.setText(forecast.temperature.min);
+                forecast_layout.addView(view);
+            }
+            if (weather.aqi!=null){
+                api_index_view.setText(weather.aqi.city.aqi);
+                pm25_index_view.setText(weather.aqi.city.pm25);
+            }
+            String comfort = "舒适度: "+weather.suggestion.comfort.info;
+            String sport = " 运动建议: " + weather.suggestion.sport.info;
+            String carwash = " 洗车指数: " + weather.suggestion.carWash.info;
+            suggestion_sport_view.setText(sport);
+            suggestion_comfort_view.setText(comfort);
+            suggestion_carwash_view.setText(carwash);
+            weather_layout.setVisibility(View.VISIBLE);
+            Intent intent = new Intent(this, AutoUpdateService.class);
+            startService(intent);
+        }else {
+            Toast.makeText(WeatherActivity.this,"获取天气信息失败",Toast.LENGTH_SHORT).show();
         }
-        if (weather.aqi!=null){
-            api_index_view.setText(weather.aqi.city.aqi);
-            pm25_index_view.setText(weather.aqi.city.pm25);
-        }
-        String comfort = "舒适度: "+weather.suggestion.comfort.info;
-        String sport = " 运动建议: " + weather.suggestion.sport.info;
-        String carwash = " 洗车指数: " + weather.suggestion.carWash.info;
-        suggestion_sport_view.setText(sport);
-        suggestion_comfort_view.setText(comfort);
-        suggestion_carwash_view.setText(carwash);
-        weather_layout.setVisibility(View.VISIBLE);
+
     }
 
     public void RequestWeatherInfo(String weatherId){
