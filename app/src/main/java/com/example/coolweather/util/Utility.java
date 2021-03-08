@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import com.example.coolweather.beans.City;
 import com.example.coolweather.beans.County;
 import com.example.coolweather.beans.Province;
+import com.example.coolweather.gson.Weather;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -71,5 +73,30 @@ public class Utility {
             }
         }
         return false;
+    }
+
+    /**
+     * 处理天气信息的查询结果，
+     * @param response 网络请求返回的请求体
+     * @return 封装成功的一个weather对象
+     */
+    public static Weather handleWeatherResponse(String response){
+        if (!TextUtils.isEmpty(response)){
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                JSONArray jsonArray = (JSONArray) jsonObject.get("HeWeather");
+                String status = (String) jsonArray.getJSONObject(0).get("status");
+                if ("ok".equalsIgnoreCase(status)){
+                    String weather = jsonArray.getJSONObject(0).toString();
+                    return new Gson().fromJson(weather,Weather.class);
+                }else {
+                    return null;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+        }
+        return null;
     }
 }
